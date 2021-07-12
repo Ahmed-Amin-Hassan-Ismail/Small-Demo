@@ -10,32 +10,36 @@ import PromiseKit
 import Alamofire
 import AlamofireObjectMapper
 import ObjectMapper
+import RxSwift
 
 
 
 class UserService {
+
     
-    static func getUserData(completion: @escaping ([UsersModel]?) -> Void) {
-        
-        let url = URL(string: "https://jsonplaceholder.typicode.com/users")!
-        Alamofire.request(url, method: .get).validate().responseJSON(completionHandler: { (response) in
+    
+    static func getDataUser() -> Promise<[UsersModel]> {
+        return Promise { seal in
             
-            if let err = response.error {
-                print(err.localizedDescription)
-            }
+            let url = "https://jsonplaceholder.typicode.com/users"
             
-            switch response.result {
-            case .success(let users):
-                guard let usersData = Mapper<UsersModel>().mapArray(JSONObject: users) else {
-                    print("Error Mapper")
-                    return
-                }
-                print(usersData)
-                completion(usersData)
-            case .failure(_):
-                print("error happen")
+            Alamofire.request(url, method: .get).responseJSON { response in
+                
+                switch response.result {
+                    
+                case .failure(let error):
+                    seal.reject(error)
+                    
+                case .success(let users):
+                    
+                    guard let usersData = Mapper<UsersModel>().mapArray(JSONObject: users) else { return }
+                    print(usersData)
+                    seal.fulfill(usersData)
+                }                
             }
-        })                
+        }
     }
 }
+
+
 

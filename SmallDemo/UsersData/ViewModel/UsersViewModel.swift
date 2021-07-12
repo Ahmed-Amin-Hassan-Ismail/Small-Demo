@@ -37,10 +37,15 @@ class UsersViewModel {
     }
     
     
-    func getData() {
+    // MARK: - Methods
     
-        UserService.getUserData { users in
-            self.usersModelSubject.onNext(users ?? [])
+    func getData() {
+        
+        UserService.getDataUser().done { users in
+            self.usersModelSubject.onNext(users)
+        }.catch { error in
+            print(error.localizedDescription)
         }
+       
     }
 }

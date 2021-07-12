@@ -14,28 +14,29 @@ import PromiseKit
 
 class APIServices {
     
-    static func APIService<T: Mappable>(url: String, method: HTTPMethod, classResponse: T.Type) -> Promise<T> {
-        return Promise<T> { seal in
+    static func APIService<T: Mappable>(url: URL, method: HTTPMethod, classResponse: T.Type) -> Promise<[T]> {
+        return Promise<[T]> { seal in
             
             // Calling Network
-            Alamofire
-                .request(url, method: method)
-                .validate()
-                .responseObject { (response: DataResponse<T>) in
+            Alamofire.request(url, method: method).responseJSON { response in
+                
+                // Handling Result
+                switch response.result {
                     
-                    // Checking for errors
-                    if let error = response.error {
-                        seal.reject(error)
-                        print(error.localizedDescription)
+                case .failure(let error):
+                    print(error.localizedDescription)
+                    seal.reject(error)
+                    
+                case .success(let users):
+                    guard let usersData = Mapper<T>().mapArray(JSONObject: users) else {
+                        print("Error Whereas mapping data")
                         return
                     }
-                    
-                    // Successful Calling
-                    if let value = response.result.value {
-                        seal.fulfill(value)
-                        print(value)
-                    }
+                    seal.fulfill(usersData)
+                    print(usersData)
+                            
                 }
+            }
         }
     }
 }
