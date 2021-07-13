@@ -33,7 +33,7 @@ class UserService {
                 case .success(let users):
                     
                     guard let usersData = Mapper<UsersModel>().mapArray(JSONObject: users) else { return }
-                    print(usersData)
+                    
                     seal.fulfill(usersData)
                 }                
             }
