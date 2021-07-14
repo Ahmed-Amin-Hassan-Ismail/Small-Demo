@@ -87,18 +87,18 @@ extension DisplayUsersViewController {
     private func subscribeToData() {
         usersViewModel?.getData()
     }
-
+    
     private func subscribeToTableView() {
         self.usersViewModel?.userModelObserver
             .bind(to: self.tableView
-                .rx
-                .items(cellIdentifier: "usersCell",
-                       cellType: UsersViewCell.self)) { row, user, cell in
+                    .rx
+                    .items(cellIdentifier: "usersCell",
+                           cellType: UsersViewCell.self)) { row, user, cell in
                 cell.idLabel.text = (String(describing: user.id ?? 0))
                 cell.titleLabel.text = user.name
                 cell.bodyLabel.text = user.email
-        }
-        .disposed(by: disposeBag)
+            }
+            .disposed(by: disposeBag)
     }
 }
 
